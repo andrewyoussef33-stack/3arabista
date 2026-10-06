@@ -1,0 +1,3 @@
+
+import { NextResponse } from 'next/server'; import { sql } from '@vercel/postgres'; import { initDB } from '@/lib/db';
+export async function POST(req:Request){ try{ await initDB(); const {password}=await req.json(); const p=String(password||'').trim(); const r=await sql`SELECT password_hash FROM settings LIMIT 1`; const stored=r.rows[0]?.password_hash?.trim()||'2026'; if(p===stored) return NextResponse.json({ok:true}); return NextResponse.json({ok:false},{status:401}); }catch(e:any){ if(String(e.message).includes('POSTGRES_URL')){ const {password}=await req.json().catch(()=>({password:''})); if(String(password).trim()==='2026') return NextResponse.json({ok:true, fallback:true}); } return NextResponse.json({ok:false,error:e.message},{status:500}); } }

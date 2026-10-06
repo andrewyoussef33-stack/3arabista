@@ -1,0 +1,5 @@
+
+import { NextResponse } from 'next/server'; import { sql } from '@vercel/postgres'; import { initDB } from '@/lib/db';
+export async function GET(){ try{ await initDB(); const r=await sql`SELECT * FROM home_sections ORDER BY order_index ASC`; return NextResponse.json(r.rows); }catch(e:any){ return NextResponse.json({error:e.message},{status:500}); } }
+export async function POST(req:Request){ try{ await initDB(); const b=await req.json(); const r=await sql`INSERT INTO home_sections (type,title_ar,title_en,text_ar,text_en,image_url,bg_color,order_index) VALUES (${b.type||'hero'},${b.title_ar||''},${b.title_en||''},${b.text_ar||''},${b.text_en||''},${b.image_url||''},${b.bg_color||'#FFFFFF'},${b.order_index||0}) RETURNING *`; return NextResponse.json(r.rows[0]); }catch(e:any){ return NextResponse.json({error:e.message},{status:500}); } }
+export async function DELETE(req:Request){ try{ await initDB(); const id=new URL(req.url).searchParams.get('id'); await sql`DELETE FROM home_sections WHERE id=${id}`; return NextResponse.json({ok:true}); }catch(e:any){ return NextResponse.json({error:e.message},{status:500}); } }

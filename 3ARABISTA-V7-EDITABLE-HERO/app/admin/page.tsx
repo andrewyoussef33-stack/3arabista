@@ -1,0 +1,1 @@
+'use client'; import { useEffect } from 'react'; export default function Admin(){ useEffect(()=>{ if(typeof window!=='undefined') window.location.href='/#admin'; },[]); return null; }

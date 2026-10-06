@@ -1,0 +1,3 @@
+
+import { NextResponse } from 'next/server'; import { sql } from '@vercel/postgres'; import { initDB } from '@/lib/db';
+export async function POST(req:Request){ try{ await initDB(); const b=await req.json(); const ex=await sql`SELECT id FROM settings LIMIT 1`; if(ex.rows.length===0){ await sql`INSERT INTO settings (password_hash) VALUES (${b.password_hash||'2026'})`; } else { if(b.password_hash) await sql`UPDATE settings SET password_hash=${b.password_hash} WHERE id=${ex.rows[0].id}`; } return NextResponse.json({ok:true}); }catch(e:any){ return NextResponse.json({error:e.message},{status:500}); } }
